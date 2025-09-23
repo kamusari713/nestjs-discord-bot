@@ -2,7 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ChannelType, Client, NonThreadGuildBasedChannel } from 'discord.js';
 import { GuildsRepository } from 'src/modules/guilds/guilds.repository';
 import { Policy } from 'src/modules/guilds/types/policy.type';
-import { DiscordService } from '../discord.service';
+import { DiscordService } from '../discord/discord.service';
 
 @Injectable()
 export class ChannelListener implements OnModuleInit {

@@ -1,20 +1,13 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  Logger,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Client } from 'discord.js';
 import { GuildsRepository } from 'src/modules/guilds/guilds.repository';
 import { QuietSchedulerSerivce } from 'src/modules/quiet/quiet-scheduler.service';
-import { DiscordService } from '../discord.service';
+import { DiscordService } from '../discord/discord.service';
 
 @Injectable()
 export class ClientListener implements OnModuleInit {
   constructor(
     private readonly discordService: DiscordService,
-    @Inject(forwardRef(() => QuietSchedulerSerivce))
     private readonly quietSchedulerService: QuietSchedulerSerivce,
     private readonly guildsRepository: GuildsRepository,
   ) {

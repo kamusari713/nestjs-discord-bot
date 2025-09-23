@@ -1,19 +1,25 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DiscordModule } from '../discord/discord.module';
+import { DiscordService } from '../discord/discord.service';
 import { Guild } from '../guilds/entities/guild.entity';
 import { GuildsRepository } from '../guilds/guilds.repository';
-import { SnapshotsModule } from '../snapshots/snapshots.module';
+import { ChannelSnapshot } from '../snapshots/entities/channel-snapshot.entity';
+import { SnapshotsService } from '../snapshots/snapshots.service';
 import { QuietEnforceService } from './quiet-enforce.service';
 import { QuietSchedulerSerivce } from './quiet-scheduler.service';
+import { QuietController } from './quiet.controller';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Guild]),
-    SnapshotsModule,
-    forwardRef(() => DiscordModule),
+  imports: [TypeOrmModule.forFeature([Guild, ChannelSnapshot]), JwtModule],
+  providers: [
+    GuildsRepository,
+    QuietEnforceService,
+    QuietSchedulerSerivce,
+    SnapshotsService,
+    DiscordService,
   ],
-  providers: [GuildsRepository, QuietEnforceService, QuietSchedulerSerivce],
   exports: [QuietSchedulerSerivce],
+  controllers: [QuietController],
 })
 export class QuietModule {}

@@ -1,7 +1,15 @@
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { ChannelType } from 'discord.js';
 import { DiscordService } from '../discord/discord.service';
 import { Guild } from '../guilds/entities/guild.entity';
+import { GuildsRepository } from '../guilds/guilds.repository';
+import { ControlOption } from '../guilds/types/control-option.type';
 import { Policy } from '../guilds/types/policy.type';
 import { SnapshotsService } from '../snapshots/snapshots.service';
 
@@ -11,6 +19,7 @@ export class QuietEnforceService {
     @Inject(forwardRef(() => DiscordService))
     private readonly discordService: DiscordService,
     private readonly snapshotService: SnapshotsService,
+    private readonly guildsRepository: GuildsRepository,
   ) {}
 
   private readonly logger = new Logger(QuietEnforceService.name, {
@@ -84,5 +93,29 @@ export class QuietEnforceService {
     this.logger.log(
       `Exit quiet mode for "${guildEntity.name}" (id: ${guildEntity.id}), policy=${guildEntity.policy}`,
     );
+  }
+
+  async manualQuiet(id: string, option: ControlOption) {
+    const guild = await this.guildsRepository.findByIdOrThrow(id);
+
+    if (guild.revoked) {
+      throw new BadRequestException(
+        `Guild "${guild.name}" (id: ${guild.id}) is revoked`,
+      );
+    }
+
+    if (!guild.enabled) {
+      throw new BadRequestException(
+        `Guild "${guild.name}" (id: ${guild.id}) quiet feature is disabled`,
+      );
+    }
+
+    if (option === ControlOption.STOP) {
+      await this.guildsRepository.updateActivity(id, false);
+      await this.exitQuiet(guild);
+    } else if (option === ControlOption.START) {
+      await this.guildsRepository.updateActivity(id, true);
+      await this.enterQuiet(guild);
+    }
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Client, Guild } from 'discord.js';
 import { GuildsRepository } from 'src/modules/guilds/guilds.repository';
-import { DiscordService } from '../discord.service';
+import { DiscordService } from '../discord/discord.service';
 
 @Injectable()
 export class GuildListener implements OnModuleInit {

@@ -1,12 +1,7 @@
-import { DynamicModule, forwardRef, Global, Module } from '@nestjs/common';
+import { DynamicModule, Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { Client, GatewayIntentBits, Partials } from 'discord.js';
-import { Guild } from '../guilds/entities/guild.entity';
-import { GuildsRepository } from '../guilds/guilds.repository';
-import { QuietModule } from '../quiet/quiet.module';
 import { DiscordService } from './discord.service';
-import * as Listeners from './listeners';
 import { DiscordOptions } from './types/options.type';
 import { DISCORD_CLIENT, DISCORD_OPTIONS } from './types/tokens.type';
 
@@ -16,10 +11,6 @@ export class DiscordModule {
   static forRootAsync(): DynamicModule {
     return {
       module: DiscordModule,
-      imports: [
-        TypeOrmModule.forFeature([Guild]),
-        forwardRef(() => QuietModule),
-      ],
       providers: [
         // firstfull inject and provide our config service
         {
@@ -49,12 +40,6 @@ export class DiscordModule {
         },
 
         DiscordService,
-        GuildsRepository,
-
-        Listeners.ChannelListener,
-        Listeners.ClientListener,
-        Listeners.GuildListener,
-        Listeners.VoiceListener,
       ],
       exports: [DISCORD_CLIENT, DiscordService],
     };
